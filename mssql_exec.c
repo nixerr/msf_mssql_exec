@@ -233,7 +233,7 @@ uint32_t mssqlParseError(char *data)
 	char *ptremsg = emsg;
 	char *p = buffer;
 	uint32_t ret = 0;
-	uint32_t errno;
+	uint32_t errnoo;
 	uint16_t elen;
 	uint8_t state, sev;
 
@@ -245,7 +245,7 @@ uint32_t mssqlParseError(char *data)
 
 //	printhex(p, len);
 
-	memcpy(&errno, p, 4);
+	memcpy(&errnoo, p, 4);
 	p+=4;
 	memcpy(&state, p, 1);
 	p+=1;
@@ -255,7 +255,7 @@ uint32_t mssqlParseError(char *data)
 	p+=2;
 
 	fromUnicode(p, ptremsg, elen*2);
-	printf("SQL Server Error #%d (State:%d Severity:%d): %s\n", errno, state, sev, ptremsg);
+	printf("SQL Server Error #%d (State:%d Severity:%d): %s\n", errnoo, state, sev, ptremsg);
 
 	return ptr-data;
 }
@@ -269,7 +269,7 @@ uint32_t mssqlParseInfo(char *data)
 	char *ptremsg = emsg;
 	char *p = buffer;
 	uint32_t ret = 0;
-	uint32_t errno;
+	uint32_t errnoo;
 	uint16_t elen;
 	uint8_t state, sev;
 
@@ -279,7 +279,7 @@ uint32_t mssqlParseInfo(char *data)
 	memcpy(p, ptr, len);
 	ptr += len;
 
-	memcpy(&errno, p, 4);
+	memcpy(&errnoo, p, 4);
 	p+=4;
 	memcpy(&state, p, 1);
 	p+=1;
@@ -290,7 +290,7 @@ uint32_t mssqlParseInfo(char *data)
 
 	fromUnicode(p, ptremsg, elen);
 
-	printf("SQL Server Info #%d (State:%d Severity:%d): %s\n", errno, state, sev, ptremsg);
+	printf("SQL Server Info #%d (State:%d Severity:%d): %s\n", errnoo, state, sev, ptremsg);
 
 	return ptr-data;
 }
