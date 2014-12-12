@@ -49,6 +49,7 @@
 #define STATUS_RESETCONNECTIONSKIPTRAN 0x10
 
 static SOCKET sock;
+static uint32_t auth = 0;
 
 /* all big-endian */
 struct p_hdr {
@@ -326,6 +327,7 @@ uint32_t mssqlParseEnv(char *data)
 
 uint32_t mssqlParseLoginAck(char *data)
 {
+	auth = 1;
 	uint16_t len;
 	uint32_t ret=0;
 	char buffer[1000];
@@ -888,7 +890,9 @@ int main(int argc, const char **argv)
 		exit(1);
 	}
 	mssqlLogin(user,pass,"");
-	mssqlQuery(query);
+	if (auth == 1) {
+		mssqlQuery(query);
+	}
 	return 0;
 }
 
