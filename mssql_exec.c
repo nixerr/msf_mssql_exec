@@ -52,6 +52,7 @@ static SOCKET sock;
 static uint32_t auth = 0;
 
 /* all big-endian */
+/* header: packet has its always  */
 struct p_hdr {
 	uint8_t		type;
 	uint8_t		status;
@@ -61,14 +62,14 @@ struct p_hdr {
 	uint8_t		window;
 } __attribute__ ((__packed__));
 
-
+/* token: token is used in preLogin */
 struct token {
 	uint8_t		token;
 	uint16_t	offset;
 	uint16_t	length;
 } __attribute__ ((__packed__));
 
-
+/* authenticate is used it */
 struct p_auth {
 	uint32_t	dummySize;
 	uint32_t	TDSVersion;
@@ -85,6 +86,7 @@ struct p_auth {
 } __attribute__ ((__packed__));
 
 /* all big-endian */
+/* as is token it is used in preLogin */
 struct p_data_token {
 	uint8_t		tVersion;   /* 0x00 */
 	uint16_t	oVersion;  /* idx = 21 size of pkt_data_token */
@@ -160,6 +162,7 @@ struct version {
 } __attribute__ ((__packed__));
 
 
+/* stupid function is used for converting to unicode */
 void toUnicode(const char *string, char *output)
 {
 	const char *ptr;
@@ -173,6 +176,7 @@ void toUnicode(const char *string, char *output)
 	}
 }
 
+/* From unicode is bigger stupid than toUnicode func */ 
 void fromUnicode(const char *string, char *output, uint32_t len)
 {
 	const char *ptr = output;
@@ -343,6 +347,10 @@ uint32_t mssqlParseLoginAck(char *data)
 	return ptr-data;
 }
 
+/*
+ * parse TDS Reply and Parse TDS Row dont rewrite from msf
+ * they are very big and not neecessary for my situation
+ */
 uint32_t mssqlParseTdsReply(char *data)
 {
 
@@ -381,10 +389,12 @@ void mssqlParseReply(char *data)
 		{
 			case 0x81:
 				printf("mssqlParseTdsReply();\n");
+				Sleep(1000);
 				exit(1);
 				break;
 			case 0xd1:
 				printf("mssqlParseTdsRow();\n");
+				Sleep(1000);
 				exit(1);
 				break;
 			case 0xe3:
@@ -435,6 +445,7 @@ void mssqlParseReply(char *data)
 	
 }
 
+/* Function "encrypts" password */
 void mssqlTDSEncrypt(const char *pass, char *output)
 {
 	char buff[1000];
@@ -455,12 +466,15 @@ void mssqlTDSEncrypt(const char *pass, char *output)
 	}
 }
 
+/* important function, if answer is bigger than 4096 or 8192 (didnt remember)
+ * then crash :)
+ */
 int mssqlSendRecv(void *packet, uint32_t packetSize, void *recvPacket)
 {
 	uint32_t done = 0;
 
 	char head[8];
-	char buffer1[1024];
+	char buffer1[8192];
 	void *ptr = head;
 	void *ptr2 = recvPacket;
 
@@ -514,6 +528,7 @@ int mssqlSendRecv(void *packet, uint32_t packetSize, void *recvPacket)
 	return 1;
 }
 
+/* Sends info query before auth... */
 int mssqlPreLogin()
 {
 	time_t t;
@@ -620,6 +635,8 @@ int mssqlPreLogin()
 	return	encryption;
 }
 
+
+/* Functions does authorizatiob is server */
 int mssqlLogin(char *user, char *pass, char *db)
 {
 	if (mssqlPreLogin() != ENCRYPT_NOT_SUP)
@@ -785,6 +802,7 @@ int mssqlLogin(char *user, char *pass, char *db)
 }
 
 
+/* Does query */
 uint32_t mssqlQuery(char *sqla)
 {
 	char packet[4096];
@@ -893,6 +911,8 @@ int main(int argc, const char **argv)
 	if (auth == 1) {
 		mssqlQuery(query);
 	}
+	Sleep(1000);
+
 	return 0;
 }
 
