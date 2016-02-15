@@ -604,9 +604,9 @@ int mssqlPreLogin()
 	memcpy((void *)&pHeader, answerPacket, 8);
 	int len  = ntohs(pHeader.length) - 8;
 
-	int count = 1;
+	int count = 0;
 	struct token foken;
-	struct token *ptrToken = (struct token *)(answerPacket+8);
+	struct token *ptrToken = (struct token *)(answerPacket+8+count*5);
 	while(ptrToken->token != 0xFF && len>5)
 	{
 		//memcpy((void *)&foken, (void *)ptrToken, 5);
@@ -618,9 +618,10 @@ int mssqlPreLogin()
 			idx = ntohs(ptrToken->offset);
 			break;
 		}
-		ptrToken += 5;
-		//len -= 5;
 		count++;
+
+		ptrToken = (struct token *)(answerPacket+8+count*5);
+		//len -= 5;
 	}
 
 	printf("Got encryption parametr. ptrToken->token = %d, ptrToken->offset = %d\n", ptrToken->token, idx);
