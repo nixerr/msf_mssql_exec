@@ -254,7 +254,7 @@ uint32_t mssqlParseError(char *data)
 	ptr += 2;
 
 	if (is_bigendian())
-		len = htobe16(len);
+		len = le16toh(len);
 
 	memcpy(p, ptr, len);
 	ptr += len;
@@ -272,8 +272,8 @@ uint32_t mssqlParseError(char *data)
 
 	if (is_bigendian())
 	{
-		errnoo = htobe32(errnoo);
-		elen = htobe16(elen);
+		errnoo = le32toh(errnoo);
+		elen = le16toh(elen);
 	}
 
 	fromUnicode(p, ptremsg, elen*2);
@@ -302,7 +302,7 @@ uint32_t mssqlParseInfo(char *data)
 	ptr += 2;
 
 	if (is_bigendian())
-		len = htobe16(len);
+		len = le16toh(len);
 
 	memcpy(p, ptr, len);
 	ptr += len;
@@ -318,8 +318,8 @@ uint32_t mssqlParseInfo(char *data)
 
 	if (is_bigendian())
 	{
-		errnoo = htobe32(errnoo);
-		elen = htobe16(elen);
+		errnoo = le32toh(errnoo);
+		elen = le16toh(elen);
 	}
 
 	fromUnicode(p, ptremsg, elen);
@@ -344,7 +344,7 @@ uint32_t mssqlParseEnv(char *data)
 	ptr += 2;
 
 	if (is_bigendian())
-		len = htobe16(len);
+		len = le16toh(len);
 
 	memcpy(p, ptr, len);
 	ptr += len;
@@ -377,7 +377,7 @@ uint32_t mssqlParseLoginAck(char *data)
 	ptr += 2;
 
 	if (is_bigendian())
-		len = htobe16(len);
+		len = le16toh(len);
 
 	memcpy(p, ptr, len);
 	ptr += len;
