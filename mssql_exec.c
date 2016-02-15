@@ -615,7 +615,7 @@ int mssqlPreLogin()
 			idx = ntohs(foken.offset);
 			break;
 		}
-		ptrToken += 5;
+		ptrToken += 5 + foken.length;
 		count++;
 	}
 
