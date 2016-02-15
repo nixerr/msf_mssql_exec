@@ -247,8 +247,14 @@ uint32_t mssqlParseError(char *data)
 	uint16_t elen;
 	uint8_t state, sev;
 
+	memset(buffer, 0x00, sizeof(buffer));
+	memset(emsg, 0x00, sizeof(emsg));
+
 	memcpy(&len, ptr, 2);
 	ptr += 2;
+
+	if (is_bigendian())
+		len = htobe16(len);
 
 	memcpy(p, ptr, len);
 	ptr += len;
@@ -263,6 +269,12 @@ uint32_t mssqlParseError(char *data)
 	p+=1;
 	memcpy(&elen, p, 2);
 	p+=2;
+
+	if (is_bigendian())
+	{
+		errnoo = htobe32(errnoo);
+		elen = htobe16(elen);
+	}
 
 	fromUnicode(p, ptremsg, elen*2);
 	printf("SQL Server Error #%d (State:%d Severity:%d): %s\n", errnoo, state, sev, ptremsg);
@@ -289,6 +301,9 @@ uint32_t mssqlParseInfo(char *data)
 	memcpy(&len, ptr, 2);
 	ptr += 2;
 
+	if (is_bigendian())
+		len = htobe16(len);
+
 	memcpy(p, ptr, len);
 	ptr += len;
 
@@ -300,6 +315,12 @@ uint32_t mssqlParseInfo(char *data)
 	p+=1;
 	memcpy(&elen, p, 2);
 	p+=2;
+
+	if (is_bigendian())
+	{
+		errnoo = htobe32(errnoo);
+		elen = htobe16(elen);
+	}
 
 	fromUnicode(p, ptremsg, elen);
 
@@ -321,6 +342,9 @@ uint32_t mssqlParseEnv(char *data)
 
 	memcpy(&len, ptr, 2);
 	ptr += 2;
+
+	if (is_bigendian())
+		len = htobe16(len);
 
 	memcpy(p, ptr, len);
 	ptr += len;
@@ -351,6 +375,9 @@ uint32_t mssqlParseLoginAck(char *data)
 
 	memcpy(&len, ptr, 2);
 	ptr += 2;
+
+	if (is_bigendian())
+		len = htobe16(len);
 
 	memcpy(p, ptr, len);
 	ptr += len;
