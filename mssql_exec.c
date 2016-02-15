@@ -668,27 +668,21 @@ int mssqlLogin(char *user, char *pass, char *db)
 
 	uint32_t lenCname = 3; /* rand() % 8 + 1; */
 	char cname[18];	/* alpha random */
-	toUnicode("ABC", (char *)&cname);
 
 	uint32_t lenUname = strlen(user);
 	char uname[99];	/* user */
-	toUnicode(user, (char *)&uname);
 
 	uint32_t lenPname = strlen(pass);
 	char pname[99];	/* mssql_tds_encrypt(pass) */
-	mssqlTDSEncrypt(pass, (char *)&pname);
 
 	uint32_t lenAname = 3; /* rand() % 8 + 1; */
 	char aname[18];	/* alpha random */
-	toUnicode("HEL", (char *)&aname);
 
-	uint32_t lenSname = sizeof("10.0.70.98");
+	uint32_t lenSname = sizeof("10.10.10.10");
 	char sname[99];	/* rhost */
-	toUnicode("10.0.70.98", (char *)&sname);
 
 	uint32_t lenDname = strlen(db);
 	char dname[99];	/* db */
-	toUnicode(db, (char *)&dname);
 
 	memset(&pHeader, 0x00, sizeof(struct p_hdr));
 	memset(&pAuth, 0x00, sizeof(struct p_auth));
@@ -700,23 +694,50 @@ int mssqlLogin(char *user, char *pass, char *db)
 	memset(sname, 0x00, sizeof(sname));
 	memset(dname, 0x00, sizeof(dname));
 
+	toUnicode("ABC", (char *)&cname);
+	toUnicode(user, (char *)&uname);
+	mssqlTDSEncrypt(pass, (char *)&pname);
+	toUnicode("HEL", (char *)&aname);
+	toUnicode("10.0.70.98", (char *)&sname);
+	toUnicode(db, (char *)&dname);
+
+
 	memset((void *)&pHeader, '\0', sizeof(struct p_hdr));
 	pHeader.type = TYPE_TDS7_LOGIN;
 	pHeader.status = STATUS_END_OF_MESSAGE;
 	pHeader.packetid = 0x01;
 
-	pAuth.dummySize		= 0x00000000;
-	pAuth.TDSVersion	= 0x71000001;
-	pAuth.size		= 0x00000000;
-	pAuth.version		= 0x00000007;
-	pAuth.PID		= rand() % 1025;
-	pAuth.connectionID	= 0x00000000;
-	pAuth.flags1		= 0xE0;
-	pAuth.flags2		= 0x03;
-	pAuth.sqlTypeFlags	= 0x00;
-	pAuth.reservedFlags	= 0x00;
-	pAuth.timeZone		= 0x00000000;
-	pAuth.collation		= 0x00000000;
+	if (!is_bigendian())
+	{
+		pAuth.dummySize		= 0x00000000;
+		pAuth.TDSVersion	= 0x71000001;
+		pAuth.size		= 0x00000000;
+		pAuth.version		= 0x00000007;
+		pAuth.PID		= rand() % 1025;
+		pAuth.connectionID	= 0x00000000;
+		pAuth.flags1		= 0xE0;
+		pAuth.flags2		= 0x03;
+		pAuth.sqlTypeFlags	= 0x00;
+		pAuth.reservedFlags	= 0x00;
+		pAuth.timeZone		= 0x00000000;
+		pAuth.collation		= 0x00000000;
+	}
+	else
+	{
+		pAuth.dummySize		= 0x00000000;
+		pAuth.TDSVersion	= 0x01000071;
+		pAuth.size		= 0x00000000;
+		pAuth.version		= 0x07000000;
+		pAuth.PID		= (rand() % 1025)<<16;
+		pAuth.connectionID	= 0x00000000;
+		pAuth.flags1		= 0xE0;
+		pAuth.flags2		= 0x03;
+		pAuth.sqlTypeFlags	= 0x00;
+		pAuth.reservedFlags	= 0x00;
+		pAuth.timeZone		= 0x00000000;
+		pAuth.collation		= 0x00000000;
+	}
+
 
 	memset(p, '\0', sizeof(packet));
 
@@ -823,9 +844,9 @@ int mssqlLogin(char *user, char *pass, char *db)
 		int z = 3;
 		for (z; z != 0; z--)
 		{
-			memcpy(p+3-z, ((char *)&pSize)[z], 1);
-			memcpy(ptrPizdecKonechno+3-z, ((char *)&pSize)[z], 1);
-			memcpy(ptrPizdecKonechno+4+3-z, ((char *)&pSize)[z], 1);
+			memcpy(p+8+3-z, ((char *)&pSize)+z, 1);
+			memcpy(ptrPizdecKonechno+3-z, ((char *)&pSize)+z, 1);
+			memcpy(ptrPizdecKonechno+4+3-z, ((char *)&pSize)+z, 1);
 
 		}
 	}
@@ -853,9 +874,10 @@ int mssqlLogin(char *user, char *pass, char *db)
 	mssqlSendRecv(p, pSize, ptrAnswer);
 
 	memcpy((void *)&pHeader, ptrAnswer, 8);
-	int len  = ntohs(pHeader.length) - 8;
+	uint16_t len  = ntohs(pHeader.length) - 8;
 
 	printf("Got %d bytes answer\n", len);
+	printhex(ptrAnswer, len);
 	mssqlParseReply(ptrAnswer);
 }
 
