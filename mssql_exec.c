@@ -544,7 +544,7 @@ int mssqlPreLogin()
 	uint8_t encryption = ENCRYPT_NOT_SUP;
 	char instoptdata[] = "MSSQLServer";
 
-	int16_t idx = 21;
+	uint16_t idx = 21;
 
 	char answer[1024];
 	char *answerPacket = answer;
