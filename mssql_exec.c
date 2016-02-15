@@ -611,7 +611,8 @@ int mssqlPreLogin()
 		memcpy((void *)&foken, (void *)ptrToken, 5);
 		if (foken.token == 0x01)
 		{
-			idx = ntohs(foken.length) - (count * 5);
+			// idx = ntohs(foken.length) - (count * 5);
+			idx = ntohs(foken.offset);
 			break;
 		}
 		ptrToken += 5;
