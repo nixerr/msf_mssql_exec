@@ -367,7 +367,8 @@ void mssqlParseReply(char *data)
 	struct token *ptrToken;
 	struct token pToken;
 	char *ptr = data;
-	int32_t size, count=0, ret;
+	int32_t count=0, ret;
+	uint16_t size;
 	uint8_t token;
 	char bufinfo[1000];
 
