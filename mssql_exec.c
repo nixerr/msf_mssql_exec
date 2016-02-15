@@ -680,7 +680,7 @@ int mssqlLogin(char *user, char *pass, char *db)
 	char dname[99];	/* db */
 	toUnicode(db, (char *)&dname);
 
-	memset((void *)&pHeader, '\0', 8);
+	memset((void *)&pHeader, '\0', sizeof(struct p_hdr));
 	pHeader.type = TYPE_TDS7_LOGIN;
 	pHeader.status = STATUS_END_OF_MESSAGE;
 	pHeader.packetid = 0x01;
@@ -789,6 +789,7 @@ int mssqlLogin(char *user, char *pass, char *db)
 	uint32_t pSize = p - packet - 8;
 	p = packet;
 
+	printf("Size of login packet = %d/%d\n", pSize,htons(pSize+8));
 	memcpy(ptrPizdecKonechno, &pSize, 4);
 	memcpy(ptrPizdecKonechno+4, &pSize, 4);
 	memcpy(p+8, &pSize, 4);
