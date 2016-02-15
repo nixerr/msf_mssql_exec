@@ -751,17 +751,20 @@ int mssqlLogin(char *user, char *pass, char *db)
 
 	idx = 36+50; /* pAuth.size = 36 */
 
+	uint16_t test;
 	if (!is_bigendian())
 		memcpy(p, &idx, 2);
 	else
-		memcpy(p, &htole16(idx), 2);
+		test = htole16(idx);
+		memcpy(p, &test, 2);
 
 	p += 2;
 
 	if (!is_bigendian())
 		memcpy(p, &lenCname, 2);
 	else
-		memcpy(p, &htole16(lenCname), 2);
+		test = htole16(lenCname);
+		memcpy(p, &test, 2);
 
 	p += 2;
 	idx += lenCname*2;
@@ -769,14 +772,16 @@ int mssqlLogin(char *user, char *pass, char *db)
 	if (!is_bigendian())
 		memcpy(p, &idx, 2);
 	else
-		memcpy(p, &htole16(idx), 2);
+		test = htole16(idx);
+		memcpy(p, &test, 2);
 
 	p += 2;
 
 	if (!is_bigendian())
 		memcpy(p, &lenUname, 2);
 	else
-		memcpy(p, &htole16(lenUname), 2);
+		test = htole16(lenUname);
+		memcpy(p, &test, 2);
 
 	p += 2;
 	idx += lenUname*2;
@@ -784,27 +789,31 @@ int mssqlLogin(char *user, char *pass, char *db)
 	if (!is_bigendian())
 		memcpy(p, &idx, 2);
 	else
-		memcpy(p, &htole16(idx), 2);
+		test = htole16(idx);
+		memcpy(p, &test, 2);
 
 	p += 2;
 
 	if (!is_bigendian())
 		memcpy(p, &lenPname, 2);
 	else
-		memcpy(p, &htole16(lenPname), 2);
+		test = htole16(lenPname);
+		memcpy(p, &test, 2);
 	p += 2;
 	idx += lenPname*2;
 	
 	if (!is_bigendian())
 		memcpy(p, &idx, 2);
 	else
-		memcpy(p, &htole16(idx), 2);
+		test = htole16(idx);
+		memcpy(p, &test, 2);
 	p += 2;
 
 	if (!is_bigendian())
 		memcpy(p, &lenAname, 2);
 	else
-		memcpy(p, &htole16(lenAname), 2);
+		test = htole16(lenAname);
+		memcpy(p, &test, 2);
 
 	p += 2;
 	idx += lenAname*2;
@@ -812,14 +821,16 @@ int mssqlLogin(char *user, char *pass, char *db)
 	if (!is_bigendian())
 		memcpy(p, &idx, 2);
 	else
-		memcpy(p, &htole16(idx), 2);
+		test = htole16(idx);
+		memcpy(p, &test, 2);
 
 	p += 2;
 
 	if (!is_bigendian())
 		memcpy(p, &lenSname, 2);
 	else
-		memcpy(p, &htole16(lenSname), 2);
+		test = htole16(lenSname);
+		memcpy(p, &test, 2);
 
 	p += 2;
 	idx += lenSname*2;
@@ -829,14 +840,16 @@ int mssqlLogin(char *user, char *pass, char *db)
 	if (!is_bigendian())
 		memcpy(p, &idx, 2);
 	else
-		memcpy(p, &htole16(idx), 2);
+		test = htole16(idx);
+		memcpy(p, &test, 2);
 
 	p += 2;
 
 	if (!is_bigendian())
 		memcpy(p, &lenAname, 2);
 	else
-		memcpy(p, &htole16(lenAname), 2);
+		test = htole16(lenAname);
+		memcpy(p, &test, 2);
 
 	p += 2;
 	idx += lenAname*2;
@@ -844,20 +857,23 @@ int mssqlLogin(char *user, char *pass, char *db)
 	if (!is_bigendian())
 		memcpy(p, &idx, 2);
 	else
-		memcpy(p, &htole16(idx), 2);
+		test = htole16(idx);
+		memcpy(p, &test, 2);
 	p += 2;
 	p += 2;
 
 	if (!is_bigendian())
 		memcpy(p, &idx, 2);
 	else
-		memcpy(p, &htole16(idx), 2);
+		test = htole16(idx);
+		memcpy(p, &test, 2);
 	p += 2;
 
 	if (!is_bigendian())
 		memcpy(p, &lenDname, 2);
 	else
-		memcpy(p, &htole16(lenDname), 2);
+		test = htole16(lenDname);
+		memcpy(p, &test, 2);
 	p += 2;
 
 	p += 2;
