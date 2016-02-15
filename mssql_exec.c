@@ -26,6 +26,9 @@
 
 #endif
 
+const uint32_t ppc = 1;
+#define is_bigendian() ( (*(char *)&ppc) == 0 )
+
 #define ENCRYPT_OFF		0x00
 #define ENCRYPT_ON		0x01
 #define ENCRYPT_NOT_SUP		0x02
@@ -277,6 +280,9 @@ uint32_t mssqlParseInfo(char *data)
 	uint16_t elen;
 	uint8_t state, sev;
 
+	memset(buffer, 0x00, sizeof(buffer));
+	memset(emsg, 0x00, sizeof(emsg));
+
 	memcpy(&len, ptr, 2);
 	ptr += 2;
 
@@ -307,6 +313,8 @@ uint32_t mssqlParseEnv(char *data)
 	uint8_t type, nlen, olen;
 	char buffer[1000];
 	char *p = buffer;
+
+	memset(buffer, 0x00, sizeof(buffer));
 
 	memcpy(&len, ptr, 2);
 	ptr += 2;
@@ -371,6 +379,8 @@ void mssqlParseReply(char *data)
 	uint16_t size;
 	uint8_t token;
 	char bufinfo[1000];
+
+	memset(bufinfo, 0x00, sizeof(bufinfo));
 
 	memcpy(&pHeader, ptr, 8);
 	ptr += 8;
@@ -680,6 +690,16 @@ int mssqlLogin(char *user, char *pass, char *db)
 	char dname[99];	/* db */
 	toUnicode(db, (char *)&dname);
 
+	memset(&pHeader, 0x00, sizeof(struct p_hdr));
+	memset(&pAuth, 0x00, sizeof(struct p_auth));
+	memset(packet, 0x00, sizeof(packet));
+	memset(cname, 0x00, sizeof(cname));
+	memset(uname, 0x00, sizeof(uname));
+	memset(pname, 0x00, sizeof(pname));
+	memset(aname, 0x00, sizeof(aname));
+	memset(sname, 0x00, sizeof(sname));
+	memset(dname, 0x00, sizeof(dname));
+
 	memset((void *)&pHeader, '\0', sizeof(struct p_hdr));
 	pHeader.type = TYPE_TDS7_LOGIN;
 	pHeader.status = STATUS_END_OF_MESSAGE;
@@ -790,15 +810,45 @@ int mssqlLogin(char *user, char *pass, char *db)
 	p = packet;
 
 	printf("Size of login packet = %d/%d\n", pSize,htons(pSize+8));
-	memcpy(ptrPizdecKonechno, &pSize, 4);
-	memcpy(ptrPizdecKonechno+4, &pSize, 4);
-	memcpy(p+8, &pSize, 4);
-	pSize = htons(pSize+8);
-	memcpy(p+2, &pSize, 2);
+	// memcpy(ptrPizdecKonechno, &pSize, 4);
+	// memcpy(ptrPizdecKonechno+4, &pSize, 4);
+
+	uint32_t pNSize = htonl(pSize);
+
+	struct p_auth *ptrAuth = p+8;
+
+
+	if (is_bigendian())
+	{
+		int z = 3;
+		for (z; z != 0; z--)
+		{
+			memcpy(p+3-z, ((char *)&pSize)[z], 1);
+			memcpy(ptrPizdecKonechno+3-z, ((char *)&pSize)[z], 1);
+			memcpy(ptrPizdecKonechno+4+3-z, ((char *)&pSize)[z], 1);
+
+		}
+	}
+	else
+	{
+		memcpy(ptrPizdecKonechno, &pSize, 4);
+		memcpy(ptrPizdecKonechno+4, &pSize, 4);
+		memcpy(p+8, &pSize, 4);
+	}
+
+	uint16_t ppSize;
+	ppSize = htons(pSize+8);
+
+	struct p_hdr *ptrHdr = p;
+	ptrHdr->length = ppSize;
+
+	//memcpy(p+2, &ppSize, 2);
 
 //	printhex(packet, ntohs(pSize));
-	pSize = ntohs(pSize);
+	pSize += 8;
 	char answer[4096];
+	memset(answer, 0x00, sizeof(answer));
+
 	char *ptrAnswer = answer;
 	mssqlSendRecv(p, pSize, ptrAnswer);
 
