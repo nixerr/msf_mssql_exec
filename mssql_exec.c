@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <stdint.h>
 #include <memory.h>
+#include <endian.h>
 
 #ifndef MINGW
 
@@ -28,6 +29,8 @@
 
 const uint32_t ppc = 1;
 #define is_bigendian() ( (*(char *)&ppc) == 0 )
+#define dwordToLittle(x) ( (x&0x000000ff)<<24 | (x&0x0000ff00)<<8 | (x&0x00ff0000)>>8 | (x&0xff000000)>>24 )
+#define shortToLittle(x) ( (x&0xff00)>>8 | (x&0x00ff)<<8 )
 
 #define ENCRYPT_OFF		0x00
 #define ENCRYPT_ON		0x01
@@ -728,7 +731,7 @@ int mssqlLogin(char *user, char *pass, char *db)
 		pAuth.TDSVersion	= 0x01000071;
 		pAuth.size		= 0x00000000;
 		pAuth.version		= 0x07000000;
-		pAuth.PID		= (rand() % 1025)<<16;
+		pAuth.PID		= dwordToLittle(rand() % 1025);
 		pAuth.connectionID	= 0x00000000;
 		pAuth.flags1		= 0xE0;
 		pAuth.flags2		= 0x03;
@@ -748,51 +751,113 @@ int mssqlLogin(char *user, char *pass, char *db)
 
 	idx = 36+50; /* pAuth.size = 36 */
 
-	memcpy(p, &idx, 2);
+	if (!is_bigendian())
+		memcpy(p, &idx, 2);
+	else
+		memcpy(p, &htole16(idx), 2);
+
 	p += 2;
-	memcpy(p, &lenCname, 2);
+
+	if (!is_bigendian())
+		memcpy(p, &lenCname, 2);
+	else
+		memcpy(p, &htole16(lenCname), 2);
+
 	p += 2;
 	idx += lenCname*2;
 
-	memcpy(p, &idx, 2);
+	if (!is_bigendian())
+		memcpy(p, &idx, 2);
+	else
+		memcpy(p, &htole16(idx), 2);
+
 	p += 2;
-	memcpy(p, &lenUname, 2);
+
+	if (!is_bigendian())
+		memcpy(p, &lenUname, 2);
+	else
+		memcpy(p, &htole16(lenUname), 2);
+
 	p += 2;
 	idx += lenUname*2;
 
-	memcpy(p, &idx, 2);
+	if (!is_bigendian())
+		memcpy(p, &idx, 2);
+	else
+		memcpy(p, &htole16(idx), 2);
+
 	p += 2;
-	memcpy(p, &lenPname, 2);
+
+	if (!is_bigendian())
+		memcpy(p, &lenPname, 2);
+	else
+		memcpy(p, &htole16(lenPname), 2);
 	p += 2;
 	idx += lenPname*2;
 	
-	memcpy(p, &idx, 2);
+	if (!is_bigendian())
+		memcpy(p, &idx, 2);
+	else
+		memcpy(p, &htole16(idx), 2);
 	p += 2;
-	memcpy(p, &lenAname, 2);
+
+	if (!is_bigendian())
+		memcpy(p, &lenAname, 2);
+	else
+		memcpy(p, &htole16(lenAname), 2);
+
 	p += 2;
 	idx += lenAname*2;
 
-	memcpy(p, &idx, 2);
+	if (!is_bigendian())
+		memcpy(p, &idx, 2);
+	else
+		memcpy(p, &htole16(idx), 2);
+
 	p += 2;
-	memcpy(p, &lenSname, 2);
+
+	if (!is_bigendian())
+		memcpy(p, &lenSname, 2);
+	else
+		memcpy(p, &htole16(lenSname), 2);
+
 	p += 2;
 	idx += lenSname*2;
 	
 	p += 4;
 	
-	memcpy(p, &idx, 2);
+	if (!is_bigendian())
+		memcpy(p, &idx, 2);
+	else
+		memcpy(p, &htole16(idx), 2);
+
 	p += 2;
-	memcpy(p, &lenAname, 2);
+
+	if (!is_bigendian())
+		memcpy(p, &lenAname, 2);
+	else
+		memcpy(p, &htole16(lenAname), 2);
+
 	p += 2;
 	idx += lenAname*2;
 
-	memcpy(p, &idx, 2);
+	if (!is_bigendian())
+		memcpy(p, &idx, 2);
+	else
+		memcpy(p, &htole16(idx), 2);
 	p += 2;
 	p += 2;
 
-	memcpy(p, &idx, 2);
+	if (!is_bigendian())
+		memcpy(p, &idx, 2);
+	else
+		memcpy(p, &htole16(idx), 2);
 	p += 2;
-	memcpy(p, &lenDname, 2);
+
+	if (!is_bigendian())
+		memcpy(p, &lenDname, 2);
+	else
+		memcpy(p, &htole16(lenDname), 2);
 	p += 2;
 
 	p += 2;
