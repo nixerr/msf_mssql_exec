@@ -16,10 +16,10 @@
 #define INVALID_SOCKET -1
 #define SOCKET_ERROR -1
 #define closesocket close
+#define Sleep(x) sleep(x/1000)
 
 
 #else
-
 
 #include <winsock2.h>
 
