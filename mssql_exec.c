@@ -608,14 +608,15 @@ int mssqlPreLogin()
 	struct token *ptrToken = (struct token *)(answerPacket+8);
 	while(ptrToken->token != 0xFF && len>5)
 	{
-		memcpy((void *)&foken, (void *)ptrToken, 5);
-		if (foken.token == 0x01)
+		//memcpy((void *)&foken, (void *)ptrToken, 5);
+		//if (foken.token == 0x01)
+		if (ptrToken->token == 0x01)
 		{
 			// idx = ntohs(foken.length) - (count * 5);
-			idx = ntohs(foken.offset);
+			idx = ntohs(ptrToken->offset);
 			break;
 		}
-		ptrToken += 5 + foken.length;
+		ptrToken += 5;
 		count++;
 	}
 
