@@ -620,6 +620,7 @@ int mssqlPreLogin()
 		count++;
 	}
 
+	printf("Got encryption parametr. ptrToken->token = %d, ptrToken->offset = %d\n", ptrToken->token, idx);
 	if(idx > 0)
 	{
 		encryption = (uint8_t)answerPacket[8+idx];
