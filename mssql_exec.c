@@ -3,7 +3,12 @@
 #include <unistd.h>
 #include <stdint.h>
 #include <memory.h>
+
+#ifndef BSD
 #include <endian.h>
+#else
+#include <sys/endian.h>
+#endif
 
 #ifndef MINGW
 
